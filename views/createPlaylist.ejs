@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/styles.css">
+
+        <script>
+        function getAccessToken() {
+            var theString = window.location.hash.substr(1)
+            var list = theString.split('&');
+            var list2 = list[0].split('=');
+            return list2[1];
+        }
+        </script>
+
+        <title>
+            K-popify
+        </title>
+    </head>
+
+    <body>
+
+        <h1 class="text-center">Playlist Info</h1>
+        <br>
+        <br>
+        <form id='playlist_form'>
+            <input id='playlist_title' type='text' name = 'title' placeholder='Playlist Title'>
+            <br>
+            <br>
+            <br>
+            <br>
+            <div id="submit_playlist" class="btn btn-primary">Create!</div>
+        </form>
+
+        <script>
+        var listOfTracks = []
+        for (i = 0; i < sessionStorage.length; i++) {
+            listOfTracks.push(sessionStorage.getItem(i.toString()))
+        }
+        document.getElementById("submit_playlist").addEventListener('click', getUserId.bind(this, createPlaylist), true)
+
+        var reqBod = {}
+
+        function getUserId(cb) {
+            const xhr = new XMLHttpRequest();
+
+            var access_token = getAccessToken();
+            xhr.open('GET', 'https://api.spotify.com/v1/me', true);
+
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('Authorization','Bearer ' + access_token);
+
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    userId = xhr.response.id;
+
+                    cb(userId, addTracks)
+
+                } else {
+                    console.log("Fail!")
+                }
+            }
+
+            xhr.responseType = 'json'
+            xhr.send(null);
+
+        }
+
+        function createPlaylist(userId, cb) {
+            reqBod.name = document.getElementById('playlist_title').value
+
+            const xhr = new XMLHttpRequest();
+            var access_token = getAccessToken();
+            xhr.open('POST', 'https://api.spotify.com/v1/users/' + userId + '/playlists', true);
+
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('Authorization','Bearer ' + access_token);
+
+            xhr.onload = () => {
+                if (xhr.status === 201) {
+
+                    cb(userId, xhr.response.id, listOfTracks)
+
+                }
+            }
+            xhr.responseType = 'json'
+            xhr.send(JSON.stringify(reqBod));
+        }
+
+        function addTracks(userId, playlistId, tracks) {
+
+            var access_token = getAccessToken();
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://api.spotify.com/v1/users/' + userId +'/playlists/' + playlistId + '/tracks', true);
+
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('Authorization','Bearer ' + access_token);
+
+            xhr.onload = () => {
+                if (xhr.status === 201) {
+                    window.location = 'success'
+
+
+                }
+            }
+            xhr.responseType = 'json'
+            xhr.send(JSON.stringify({"uris": tracks}));
+        }
+
+        </script>
+    </body>
+
+</html>

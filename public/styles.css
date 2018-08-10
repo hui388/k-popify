@@ -1,0 +1,150 @@
+#search {
+    height:50px;
+    width: 400px;
+
+    transition: width 0.4s ease-in-out;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 30px;
+    font-family: 'Lato', sans-serif;
+
+
+
+}
+
+.ui-menu-item  {
+    border-radius: 0px;
+    border: 1px solid black;
+    /* margin-left: -40px; */
+    width: 100%;
+}
+
+ul.ui-autocomplete {
+    list-style: none;
+    padding: 0px;
+    background-color: white;
+    /* opacity: 1; */
+}
+
+.ui-helper-hidden-accessible { display:none; }
+
+
+#search:focus {
+    width: 70%;
+
+}
+
+#login {
+    display: block;
+    width: 100px;
+    margin: 0 auto;
+}
+/* form {
+    text-align: center;
+} */
+
+#create_playlist {
+    /* height:150px; */
+    /* position: absolute; */
+    width:200px;
+    display: block;
+    background-color: red;
+    margin: 0 auto;
+    /* float: center; */
+    margin-bottom: 5%;
+}
+
+h1, h2 {
+    font-family: 'Open Sans', sans-serif;
+}
+
+h1 {
+    font-size: 40px;
+}
+
+h2 {
+    font-size: 25px;
+}
+
+#playlist_title{
+    height:50px;
+    width: 300px;
+    display: block;
+    margin: 0 auto;
+    font-size: 25px;
+}
+
+#submit_playlist {
+    height:45px;
+    width: 150px;
+    display: block;
+    margin: 0 auto;
+    font-size: 20px;
+    background-color: red;
+    padding: none;
+}
+
+.radio {
+    /* height:50px;
+    width: 100px; */
+    display: inline;
+    /* margin: 0 auto; */
+    font-size: 700px;
+}
+
+#radio_div {
+    height:50px;
+    width: 300px;
+    display: block;
+    margin: 0 auto;
+    /* background-color: red; */
+    font-size: 25px;
+
+
+}
+
+#private {
+    float: right;
+    margin-right:20px;
+}
+
+#public {
+    float: left;
+    margin-left:20px;
+}
+
+#info {
+    style: inline;
+}
+
+.audioDiv {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+    margin-bottom: 100px;
+}
+
+#cover {
+    margin-right: 20px;
+    margin-left: 15%;
+}
+
+#info {
+    margin-right: 100px;
+    font-size: 20px;
+}
+
+#trackPlayer {
+    position: absolute;
+    right: 0;
+    margin-right: 15%;
+}
+
+#another {
+    display: block;
+    width: 200px;
+    margin: 0 auto;
+    background-color: red;
+}

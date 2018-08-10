@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>K-popify</title>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/styles.css">
+        <link href="https://fonts.googleapis.com/css?family=Lato|Open+Sans:800" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script
+  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+  crossorigin="anonymous"></script>
+
+        <script>
+            const authEndpoint = 'https://accounts.spotify.com/authorize';
+            var client_id = 'da7add24ef5c43f68c2072f792e39de6'; // Your client id
+            var client_secret = 'c102a8d7f860430e899d71c3ae6a112b';
+            var redirect_uri = 'http://kpopify.marumary.com/create_playlist/'; // Your redirect uri
+            const scopes = 'user-top-read playlist-modify-public streaming user-read-birthdate user-read-email user-read-private user-modify-playback-state playlist-modify-private'
+            var listOfTracks =[]
+
+            function getAccessToken(thisWindow) {
+                var theString = thisWindow.location.hash.substr(1)
+                var list = theString.split('&');
+                var list2 = list[0].split('=');
+                return list2[1];
+            }
+            $(document).ready(function(){
+                $(function() {
+
+                    document.getElementById('search').addEventListener("keyup", searchQuery.bind(this, document.getElementById('search')))
+                    document.getElementById('create_playlist').addEventListener("click", login.bind(this))
+
+                    var namesAndArtists =[];
+                    var allData;
+                    function renderRecs(recs) {
+
+                        document.getElementById('create_playlist').style.display = 'block'
+
+                        $(".trackInfo").remove()
+
+                        var tracks = [];
+                        for (var i = 0; i < recs.tracks.length; i++) {
+
+                            var audioDiv = document.createElement('div');
+                            audioDiv.setAttribute('class', 'audioDiv')
+                            tracks.push(recs.tracks[i].uri);
+                            listOfTracks.push(recs.tracks[i].uri.split(':')[2]);
+                            sessionStorage.setItem(i.toString(),recs.tracks[i].uri)
+                            var trackPlayer = document.createElement('audio');
+                            trackPlayer.setAttribute('controls', "");
+                            trackPlayer.setAttribute('name', 'media')
+                            trackPlayer.style.display = 'inline-block'
+                            if (recs.tracks[i].preview_url != null){
+                                trackPlayer.setAttribute('src', recs.tracks[i].preview_url)
+
+                            }
+                            trackPlayer.setAttribute('class', 'trackInfo');
+                            trackPlayer.setAttribute('id', 'trackPlayer');
+
+
+
+                            var cover = document.createElement('img');
+                            cover.setAttribute('src', recs.tracks[i].album.images[2].url);
+                            cover.style.display = 'block'
+                            cover.setAttribute('class', 'trackInfo');
+                            cover.setAttribute('id', 'cover');
+
+
+
+
+                            var info = document.createElement('p');
+                            info.setAttribute('class', 'trackInfo');
+                            info.setAttribute('id', 'info');
+
+
+                            if (recs.tracks[i].preview_url == null) {
+                                info.innerHTML = recs.tracks[i].name + ' - ' + recs.tracks[i].artists[0].name + " (No preview)"
+
+                            }else{
+                                info.innerHTML = recs.tracks[i].name + ' - ' + recs.tracks[i].artists[0].name
+
+                            }
+                            document.getElementById('body').appendChild(audioDiv)
+
+                            audioDiv.appendChild(cover)
+
+                            audioDiv.appendChild(info)
+
+                            audioDiv.appendChild(trackPlayer)
+
+
+                        }
+
+                        $(function(){
+                            $("audio").on("play", function() {
+                                $("audio").not(this).each(function(index, audio) {
+                                    audio.pause();
+                                });
+                            });
+                        });
+
+                    }
+                    function searchQuery(input){
+                        var searchText = input.value;
+
+                        $("#search").autocomplete({
+                            source: function(request, response) {
+                                $.ajax({
+                                    url: '/autocomplete',
+                                    type: 'post',
+                                    data: {"searchTerm":searchText},
+                                    async: true,
+                                    success: function(data) {
+                                        namesAndArtists =[];
+                                        allData = data
+                                        data.forEach((track) => {
+                                            namesAndArtists.push(track.name + ' // ' + track.artist)
+                                        })
+                                        response(namesAndArtists)
+                                    }
+
+                                })
+
+
+                            },
+                            select: function(e, ui) {
+                                var uri;
+                                for(var i = 0; i < allData.length; i++) {
+                                    if(allData[i].name == (ui.item.value).split(' // ')[0] && allData[i].artist ==(ui.item.value).split(' // ')[1]) {
+                                        uri = allData[i].uri
+                                    }
+                                }
+                                $.ajax({
+                                    url: '/login',
+                                    type: 'post',
+                                    data: {"trackUri": (uri).split(':')[2]},
+                                    async: true,
+                                    success: function(data) {
+                                        renderRecs(data);
+                                    }
+                                })
+
+                            },
+                            appendTo: '#menu-container',
+                            messages: {
+                                noResults: '',
+                                results: function() {}
+                            }
+                        })
+                    }
+                })
+
+            })
+
+            function login(myTracks) {
+                window.location = (`${authEndpoint}?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=` + encodeURIComponent(scopes) +  '&response_type=token&show_dialog=false');
+
+            }
+
+        </script>
+    </head>
+
+    <body id='body'>
+
+        <h1 class="text-center">K-Popify</h1>
+        <h2 class="text-center">Make a playlist with K-pop tracks based on your favorite song</h2>
+        <br>
+        <form >
+  <input id="search" type="text" name="search" placeholder="Search for a track...">
+  <div id="menu-container" style="position:absolute; width: 500px;"></div>
+
+</form>
+<br>
+<br>
+    <div id="create_playlist" class=" btn btn-primary" style="display:none">Create Playlist!</div>
+    </body>
+</html>
