@@ -1,0 +1,27 @@
+{
+  "name": "kpop_generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "",
+    "express": "",
+    "ejs": "",
+    "querystring": "",
+    "request": "",
+    "cors": "",
+    "cookie-parser": ""
+
+  },
+  "author": "",
+  "license": "ISC",
+
+  "engines": {
+    "node": "6.9.4",
+    "npm": "3.10.10"
+  }
+}
